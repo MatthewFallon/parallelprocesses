@@ -1,21 +1,46 @@
 package io.fallon;
 
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Arrays;
+
 public class Sqrt {
+    private static ThrdInfo[] results;
+    public static Writer tw;
+    private static StatefulBeanToCsv<ThrdInfo> csvTw;
+    public static Writer pw;
+    private static StatefulBeanToCsv<ProcessInfo> csvPw;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
+        if(csvTw == null && csvPw == null){ // Singleton FileWriter
+            tw = new FileWriter("sqrtThread.csv");
+            csvTw = new StatefulBeanToCsvBuilder<ThrdInfo>(tw)
+                    .withProfile("")
+                    .build();
+            pw = new FileWriter("sqrtProcess.csv");
+            csvPw = new StatefulBeanToCsvBuilder<ProcessInfo>(pw)
+                    .withProfile("")
+                    .build();
+        }
 
-//        if(args.length < 2) {System.out.println("Not enough Args"); return;}
-//        int numChild = Integer.parseInt(args[0]);
-//        int total = Integer.parseInt(args[1]);
+        int numChild = Main.numChild;
+        int total = Main.total;
 
-        int numChild = 6;
-        int total = 20000;
+        ProcessInfo processResults = new ProcessInfo();
+        processResults.start();
 
         int range = total/numChild; // May require they be divisible by each other to cover all.
         Thread[] threads = new Thread[numChild];
+        results = new ThrdInfo[numChild];
         for (int i = 0; i < numChild; i++) {
             int begin = (i * range) + i;
-            threads[i] = new Thread(new SqrtThrd(begin, begin + range));
+            threads[i] = new Thread(new SqrtThrd(begin, begin + range, i), "" + (i + 1));
             threads[i].start();
         }
 
@@ -28,41 +53,52 @@ public class Sqrt {
             }
         }
 
+        processResults.stop();
+        System.err.println();
+        System.err.println(processResults);
+        System.out.println();
+        for (ThrdInfo info :
+                results) {
+            System.err.println(info);
+        }
+
+
         System.err.printf("All children done: %d\n", numChild);
+
+        csvTw.write(Arrays.asList(results));
+        csvPw.write(processResults);
 
     }
 
     private static class SqrtThrd implements Runnable{
         private final int begin;
         private final int end;
+        private final int threadIndex;
 
-        public SqrtThrd(int begin, int end){
+        public SqrtThrd(int begin, int end, int threadIndex){
             this.begin = begin;
             this.end = end;
+            this.threadIndex = threadIndex;
         }
 
         @Override
         public void run() {
-            String tName = Thread.currentThread().getName();
-            
-
-            long start = System.nanoTime();
+            Sqrt.results[threadIndex] = new ThrdInfo();
+            Sqrt.results[threadIndex].start();
             double total = 0.0;
             for(int i=begin; i <= end; i++) {
                 double root = Math.sqrt(i);
                 total += root;
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Thread.sleep(1);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
                 System.out.printf("%d:%f ", i, root);
                 if (i % 5 == 0) System.out.println();
             }
-            long duration = System.nanoTime() - start;
-
-            System.err.printf("Thread: %5s\tDuration: %f\tTotal: %f\n", tName, duration / 100000.0, total);
-
+            System.out.printf("total:%s", total);
+            Sqrt.results[threadIndex].stop();
         }
     }
 }
