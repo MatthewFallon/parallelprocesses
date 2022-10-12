@@ -11,9 +11,11 @@ public class Main {
 
     public static void main(String[] args) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
         int topChild = 16;
+        int bottomChild = 1;
         int topTotal = 1000000;
-        for (int i = 1; i <= topChild; i *= 2) {
-            for (int j = 1; j <= topTotal; j *= 10) {
+        int bottomTotal = 1000;
+        for (int i = bottomChild; i <= topChild; i *= 2) {
+            for (int j = bottomTotal; j <= topTotal; j *= 10) {
                 numChild = i;
                 total = j;
                 Factor.main(new String[]{});
@@ -22,8 +24,8 @@ public class Main {
         Factor.tw.close();
         Factor.pw.close();
 
-        for (int i = 1; i <= topChild; i *= 2) {
-            for (int j = 1; j <= topTotal; j *= 10) {
+        for (int i = bottomChild; i <= topChild; i *= 2) {
+            for (int j = bottomTotal; j <= topTotal; j *= 10) {
                 numChild = i;
                 total = j;
                 Sqrt.main(new String[]{});
