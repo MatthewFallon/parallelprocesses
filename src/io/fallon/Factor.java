@@ -88,14 +88,14 @@ public class Factor {
             for(int i=begin; i <= end; i++) {
                 for (int j = 2; j <= i/2; j++) {
                     if(i % j == 0) break;
-                    if(j == i/2) {
-                        System.out.printf("F:%d\n", i);
-//                        try {
-//                            Thread.sleep(1);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-                    }
+//                    if(j == i/2) {
+//                        System.out.printf("F:%d\n", i);
+////                        try {
+////                            Thread.sleep(1);
+////                        } catch (InterruptedException e) {
+////                            e.printStackTrace();
+////                        }
+//                    }
                 }
             }
             Factor.results[threadIndex].stop();

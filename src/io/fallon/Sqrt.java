@@ -94,8 +94,8 @@ public class Sqrt {
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
-                System.out.printf("%d:%f ", i, root);
-                if (i % 5 == 0) System.out.println();
+//                System.out.printf("%d:%f ", i, root);
+//                if (i % 5 == 0) System.out.println();
             }
             System.out.printf("total:%s", total);
             Sqrt.results[threadIndex].stop();
